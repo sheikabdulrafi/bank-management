@@ -38,6 +38,7 @@ public class BankModel {
 
   private boolean isVerified;
   private String multiPurpose;
+  private String[] roles;
 
   public BankModel() {}
 

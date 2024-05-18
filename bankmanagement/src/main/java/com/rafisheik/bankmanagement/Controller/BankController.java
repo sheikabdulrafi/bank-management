@@ -1,11 +1,14 @@
 package com.rafisheik.bankmanagement.Controller;
 
 import com.rafisheik.bankmanagement.Model.BankModel;
+import com.rafisheik.bankmanagement.Model.LoginHelper;
+import com.rafisheik.bankmanagement.Model.ResponseModel;
 import com.rafisheik.bankmanagement.Repository.BankRepo;
 import com.rafisheik.bankmanagement.Service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,19 +24,42 @@ public class BankController {
   @Autowired
   EmailService emailService;
 
+  @Autowired
+  PasswordEncoder passwordEncoder;
+
   @GetMapping("/")
-  public ResponseEntity<String> home() {
-    return ResponseEntity.status(HttpStatus.OK).body("Welcome to the Server");
+  public ResponseEntity<ResponseModel> home() {
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .body(new ResponseModel(true, "Welcome to the Server", null, null));
   }
 
-  @PostMapping("/new")
-  public ResponseEntity<String> createAccount(@RequestBody BankModel data) {
-    if (data == null) {
-      return ResponseEntity.badRequest().build();
+  @PostMapping("/user/new")
+  public ResponseEntity<ResponseModel> createAccount(
+    @RequestBody BankModel data
+  ) {
+    if (
+      data.getUserName().isBlank() ||
+      data.getPassword().isBlank() ||
+      data.getEmailId().isBlank() ||
+      data.getBalanceAmount() < 0 ||
+      data.getMobileNumber().isBlank()
+    ) {
+      return ResponseEntity
+        .status(404)
+        .body(
+          new ResponseModel(
+            false,
+            "Invalid data",
+            "Please fill all required feilds",
+            null
+          )
+        );
     }
 
     data.setAccountNumber(System.currentTimeMillis());
     data.setMultiPurpose(String.valueOf(System.currentTimeMillis()));
+    data.setPassword(passwordEncoder.encode(data.getPassword()));
 
     BankModel user = repo.insert(data);
 
@@ -48,10 +74,10 @@ public class BankController {
 
     return ResponseEntity
       .status(HttpStatus.CREATED)
-      .body("Please verify your email");
+      .body(new ResponseModel(true, "Please verify you email Id", null, null));
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/user/{id}")
   public ResponseEntity<BankModel> verifyAccount(@PathVariable String id) {
     if (id.isBlank()) {
       return ResponseEntity.badRequest().build();
@@ -75,5 +101,58 @@ public class BankController {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+  }
+
+  @PostMapping("/user/login")
+  public ResponseEntity<ResponseModel> login(
+    @RequestBody LoginHelper loginHelper
+  ) {
+    if (
+      loginHelper.getUserName().isBlank() || loginHelper.getPassword().isBlank()
+    ) {
+      return ResponseEntity
+        .status(404)
+        .body(
+          new ResponseModel(
+            false,
+            "Invalid data",
+            "Please fill all required feilds",
+            null
+          )
+        );
+    }
+
+    BankModel user = repo.findByuserName(loginHelper.getUserName());
+    if (user == null) {
+      return ResponseEntity
+        .status(404)
+        .body(
+          new ResponseModel(
+            false,
+            "Invalid Credentials",
+            "Please Enter correct credentials",
+            null
+          )
+        );
+    }
+
+    if (
+      !passwordEncoder.matches(loginHelper.getPassword(), user.getPassword())
+    ) {
+      return ResponseEntity
+        .status(404)
+        .body(
+          new ResponseModel(
+            false,
+            "Invalid Credentials",
+            "Please Enter correct credentials",
+            null
+          )
+        );
+    }
+
+    return ResponseEntity
+      .status(HttpStatus.ACCEPTED)
+      .body(new ResponseModel(true, "Login Successfull", null, user));
   }
 }
