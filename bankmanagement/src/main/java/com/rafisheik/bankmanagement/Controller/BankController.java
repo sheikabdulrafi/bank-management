@@ -57,15 +57,23 @@ public class BankController {
       return ResponseEntity.badRequest().build();
     }
 
-    BankModel user = repo.findBymultiPurpose(id);
-    user.setVerified(true);
-    user.setMultiPurpose("");
-    user = repo.save(user);
-    emailService.sendEmail(
-      user.getEmailId(),
-      "Heaven Safe Bank | Account Verified Successfully",
-      user.toString()
-    );
-    return ResponseEntity.status(HttpStatus.OK).body(user);
+    try {
+      BankModel user = repo.findBymultiPurpose(id);
+      System.out.println("\n\n\n" + user.isVerified());
+      if (user.isVerified()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      }
+      user.setVerified(true);
+      user.setMultiPurpose("");
+      user = repo.save(user);
+      emailService.sendEmail(
+        user.getEmailId(),
+        "Heaven Safe Bank | Account Verified Successfully",
+        user.toString()
+      );
+      return ResponseEntity.status(HttpStatus.OK).body(user);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 }
