@@ -1,11 +1,12 @@
 package com.rafisheik.bankmanagement.Model;
 
-import java.lang.*;
-import java.time.Instant;
+
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +15,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @Document(collection = "UserDetails")
 public class BankModel {
+
+  @Id
+  private String id;
 
   @Indexed(unique = true)
   private String userName;
@@ -30,6 +34,7 @@ public class BankModel {
   private String mobileNumber;
 
   private float balanceAmount;
+  @SuppressWarnings("rawtypes")
   private List statement;
   private boolean isVerified;
   private String multiPurpose;
