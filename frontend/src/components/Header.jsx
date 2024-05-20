@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <nav>
+    <nav id="top">
       <h1>HSF Bank</h1>
       <main>
         <span className="item">
