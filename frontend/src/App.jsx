@@ -6,6 +6,7 @@ import Myaccount from "./Pages/Myaccount.jsx";
 import Profile from "./Pages/Profile.jsx";
 import Settings from "./Pages/Settings.jsx";
 import Footer from "./components/Footer.jsx";
+import Balance from "./components/Balance.jsx";
 
 const App = () => {
   return (
@@ -14,7 +15,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/transactions" element={<Transactions />} />
-        <Route path="/myaccount" element={<Myaccount />} />
+        <Route path="/myaccount" element={<Balance />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>

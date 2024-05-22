@@ -1,0 +1,14 @@
+{
+  "_id": {
+    "$oid": "664852013b5d4777a515e18e"
+  },
+  "userName": "rafisheik",
+  "password": "1234",
+  "accountNumber": 1716015617218,
+  "emailId": "sheikabdulrafi@gmail.com",
+  "mobileNumber": "8185955455",
+  "balanceAmount": 500,
+  "isVerified": true,
+  "multiPurpose": "",
+  "_class": "com.rafisheik.bankmanagement.Model.BankModel"
+}
